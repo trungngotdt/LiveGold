@@ -1,11 +1,61 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="LiveGold.Views.MainPage"
+             x:Class="LiveGold.Views.MainPage" 
+             NavigationPage.HasNavigationBar="False"
+             xmlns:extension="clr-namespace:Xamarin.Forms.Skeleton;assembly=Xamarin.Forms.Skeleton"
+             xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
              Title="{Binding Title}">
+    <ScrollView  >
+        <StackLayout VerticalOptions="Center"
+                     extension:Skeleton.IsParent="True"
+                               extension:Skeleton.IsBusy="{Binding IsLoading}"
+                               extension:Skeleton.Animation="Fade">
+            
+            <yummy:PancakeView BackgroundColor="#1e1e1e"
+                               HasShadow="true"
+                               BorderThickness="4"
+                               CornerRadius="40,0,0,100"
+                               HorizontalOptions="FillAndExpand"
+                               HeightRequest="150"
+                              extension:Skeleton.BackgroundColor="#4d4747"
+                               extension:Skeleton.IsBusy="{Binding IsLoading}"
+                               extension:Skeleton.Animation="Fade">
+                <StackLayout VerticalOptions="Center">
+                    <Label Text="In VietNam" HorizontalOptions="Center" FontSize="Title" VerticalOptions="Center" TextColor="White"/>
+                    <StackLayout HorizontalOptions="Center" Orientation="Vertical">
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="Buy" TextColor="White" FontSize="Large"/>
+                            <Label Text="{Binding BuyLocal}" TextColor="{Binding ColorBuyLocal}" FontSize="Large"/>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="Sell" TextColor="White" FontSize="Large"/>
+                            <Label Text="{Binding SellLocal}" TextColor="{Binding ColorSellLocal}" FontSize="Large"/>
+                        </StackLayout>
+                    </StackLayout>
+                </StackLayout>
+            </yummy:PancakeView>
 
-    <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-        <Label Text="Welcome to Xamarin Forms and Prism!" />
-    </StackLayout>
+            <yummy:PancakeView BackgroundColor="#1e1e1e"
+                               HasShadow="true"
+                               BorderThickness="4"
+                               CornerRadius="40,0,0,100"
+                               HorizontalOptions="FillAndExpand"
+                               HeightRequest="150"
+                               extension:Skeleton.BackgroundColor="#4d4747"
+                               extension:Skeleton.IsBusy="{Binding IsLoading}"
+                               extension:Skeleton.Animation="Fade">
+                <StackLayout VerticalOptions="Center">
+                    <Label Text="Global" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White" FontSize="Title"/>
+                    <StackLayout HorizontalOptions="Center" Orientation="Vertical" VerticalOptions="Center">
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="{Binding BuyGlobal}" TextColor="{Binding ColorBuyGlobal}" FontSize="Large"/>
+                        </StackLayout>
+                    </StackLayout>
+                </StackLayout>
+            </yummy:PancakeView>
+        </StackLayout>
+    </ScrollView>
+
 
 </ContentPage>
