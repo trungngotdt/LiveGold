@@ -14,6 +14,7 @@ using Xamarin.Essentials;
 using System.Threading.Tasks;
 using System.Xml;
 using Prism.Services;
+using LiveGold.Models;
 
 namespace LiveGold.ViewModels
 {
@@ -21,15 +22,17 @@ namespace LiveGold.ViewModels
     {
         const string upColor = "#11ff00";
         const string downColor = "Red";
-        public string ColorBuyLocal { get; set; }
+        
         public string ColorBuyGlobal { get; set; }
-        public string ColorSellLocal { get; set; }
+        
         public string BuyGlobal { get; set; }
         public string SellGlobal { get; set; }
-        public string BuyLocal { get; set; }
-        public string SellLocal { get; set; }
+       
         public bool IsLoading { get; set; }
         private readonly IPageDialogService dialogService;
+        public string Unit { get; set; }
+        public string Updated { get; set; }
+        public List<GoldSJC> GoldSJCs { get; set; }
         public MainPageViewModel(INavigationService navigationService, IPageDialogService _dialogService)
             : base(navigationService)
         {
@@ -40,8 +43,8 @@ namespace LiveGold.ViewModels
 
         void DefaultValue()
         {
-            ColorSellLocal = ColorBuyLocal = ColorBuyGlobal = upColor;
-            BuyGlobal = BuyLocal = SellGlobal = SellLocal = "0";
+            GoldSJCs = new List<GoldSJC>();
+            BuyGlobal =  SellGlobal = "0";
         }
 
         async Task GetLocalPrice()
@@ -53,7 +56,7 @@ namespace LiveGold.ViewModels
             }))
             {
                 string timespan = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
-                ;
+                GoldSJCs = new List<GoldSJC>();
                 var httpRequestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
@@ -70,24 +73,40 @@ namespace LiveGold.ViewModels
                 var xml = await result.Content.ReadAsStringAsync();
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(xml);
-                XmlNode node = doc.DocumentElement.SelectNodes("/root/ratelist/city/item")[0];
-                var temp = node.Attributes["buy"].Value;
-                var temp1 = node.Attributes["sell"].Value;
-                ColorBuyLocal = float.Parse(temp) >= float.Parse(BuyLocal) ? upColor : downColor;
-                ColorSellLocal = float.Parse(temp1) >= float.Parse(SellLocal) ? upColor : downColor;
-                BuyLocal = temp;
-                SellLocal = temp1;
-                RaisePropertyChanged("BuyLocal");
-                RaisePropertyChanged("SellLocal");
-
-                RaisePropertyChanged("ColorBuyLocal");
-                RaisePropertyChanged("ColorSellLocal");
+                var nodeRoot = doc.DocumentElement.SelectNodes("/root/ratelist");
+                Unit = String.Concat(" ", nodeRoot[0].Attributes["unit"].Value);
+                Updated = nodeRoot[0].Attributes["updated"].Value;
+                
+                if (nodeRoot[0].HasChildNodes)
+                {
+                    var nodeCities = nodeRoot[0].ChildNodes;
+                    var lengthNodeCities = nodeCities.Count;
+                    for (int i = 0; i < lengthNodeCities; i++)
+                    {
+                        //For now
+                        if (i == 1)
+                        {
+                            break;
+                        }
+                        if (nodeCities[i].HasChildNodes)
+                        {
+                            var nodeItems = nodeCities[i].ChildNodes;
+                            var count = nodeItems.Count;
+                            for (int j = 0; j < count; j++)
+                            {
+                                GoldSJCs.Add(new GoldSJC()
+                                {
+                                    Buy = String.Concat(nodeItems[j].Attributes["buy"].Value, Unit),
+                                    Sell = String.Concat(nodeItems[j].Attributes["sell"].Value, Unit),
+                                    City = nodeCities[i].Attributes["name"].Value,
+                                    Type = nodeItems[j].Attributes["type"].Value
+                                });
+                            }
+                        }
+                    }
+                }
+                RaisePropertyChanged("GoldSJCs");               
                 httpRequestMessage.Dispose();
-                xml = null;
-                doc = null;
-                node = null;
-                temp = null;
-                temp1 = null;
             }
         }
         async Task GetGlobalPrice()
@@ -116,14 +135,10 @@ namespace LiveGold.ViewModels
 
                 var prices = (data["items"].Value<JArray>())[0].Value<JObject>();
                 var temp = prices["xauPrice"].Value<string>();
-                ColorBuyGlobal =float.Parse( temp )>= float.Parse(BuyGlobal) ? upColor : downColor;
+                ColorBuyGlobal = float.Parse(temp) >= float.Parse(BuyGlobal) ? upColor : downColor;
                 BuyGlobal = temp;
                 RaisePropertyChanged("BuyGlobal");
                 RaisePropertyChanged("ColorBuyGlobal");
-                json = String.Empty;
-                data = null;
-                prices = null;
-                temp = null;
                 httpRequestMessage.Dispose();
             }
         }
@@ -131,7 +146,7 @@ namespace LiveGold.ViewModels
         {
             IsLoading = true;
             RaisePropertyChanged("IsLoading");
-          
+
             Task.Run(async () =>
             {
                 try
@@ -161,7 +176,7 @@ namespace LiveGold.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    await dialogService.DisplayAlertAsync("Error", "Something is wrong", "OK");
+                    await dialogService.DisplayAlertAsync("Error", "Something is wrong " + ex.Message, "OK");
                 }
 
 

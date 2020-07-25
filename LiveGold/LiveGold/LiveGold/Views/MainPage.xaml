@@ -6,11 +6,68 @@
              xmlns:extension="clr-namespace:Xamarin.Forms.Skeleton;assembly=Xamarin.Forms.Skeleton"
              xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
              Title="{Binding Title}">
-    <ScrollView  >
+    <Grid>
+        <ActivityIndicator IsRunning="{Binding IsLoading}" VerticalOptions="CenterAndExpand"/>
+        <StackLayout Orientation="Vertical">
+            <StackLayout.Triggers>
+                <DataTrigger TargetType="StackLayout" Binding="{Binding IsLoading}" Value="True">
+                    <Setter Property="Opacity" Value="0.7"/>
+                    <Setter Property="IsEnabled" Value="False"/>
+                </DataTrigger>
+                <DataTrigger TargetType="StackLayout" Binding="{Binding IsLoading}" Value="False">
+                    <Setter Property="Opacity" Value="1"/>
+                    <Setter Property="IsEnabled" Value="True"/>
+                </DataTrigger>
+            </StackLayout.Triggers>
+            <StackLayout>
+
+                <Entry Text="Ho Chi Minh City" IsReadOnly="True"/>
+                <ScrollView >
+                    <ListView ItemsSource="{Binding GoldSJCs}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <ViewCell.View>
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label Text="Buy:" VerticalOptions="Center"/>
+                                            <Label Text="{Binding Buy}" VerticalOptions="Center"/>
+                                            <Label Text="Sell:" VerticalOptions="Center"/>
+                                            <Label Text="{Binding Sell}" VerticalOptions="Center"/>
+                                            <Label Text="{Binding Type}" VerticalOptions="Center"/>
+
+                                        </StackLayout>
+                                    </ViewCell.View>
+                                </ViewCell>
+
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                </ScrollView>
+                <TableView>
+                    <TableSection Title="Global">
+                        <ViewCell>
+                            <ViewCell.View>
+                                <StackLayout>
+                                    <Label Text="{Binding BuyGlobal}" TextColor="{Binding ColorBuyGlobal}" FontSize="Large"/>
+
+                                </StackLayout>
+                            </ViewCell.View>
+                        </ViewCell>
+
+                    </TableSection>
+                </TableView>
+            </StackLayout>
+
+
+        </StackLayout>
+
+    </Grid>
+    <!--
+       <ScrollView  >
         <StackLayout VerticalOptions="Center"
                      extension:Skeleton.IsParent="True"
-                               extension:Skeleton.IsBusy="{Binding IsLoading}"
-                               extension:Skeleton.Animation="Fade">
+                               extension:Skeleton.IsBusy="{Binding IsLoading}">
             
             <yummy:PancakeView BackgroundColor="#1e1e1e"
                                HasShadow="true"
@@ -19,8 +76,7 @@
                                HorizontalOptions="FillAndExpand"
                                HeightRequest="150"
                               extension:Skeleton.BackgroundColor="#4d4747"
-                               extension:Skeleton.IsBusy="{Binding IsLoading}"
-                               extension:Skeleton.Animation="Fade">
+                               extension:Skeleton.IsBusy="{Binding IsLoading}">
                 <StackLayout VerticalOptions="Center">
                     <Label Text="In VietNam" HorizontalOptions="Center" FontSize="Title" VerticalOptions="Center" TextColor="White"/>
                     <StackLayout HorizontalOptions="Center" Orientation="Vertical">
@@ -43,8 +99,7 @@
                                HorizontalOptions="FillAndExpand"
                                HeightRequest="150"
                                extension:Skeleton.BackgroundColor="#4d4747"
-                               extension:Skeleton.IsBusy="{Binding IsLoading}"
-                               extension:Skeleton.Animation="Fade">
+                               extension:Skeleton.IsBusy="{Binding IsLoading}">
                 <StackLayout VerticalOptions="Center">
                     <Label Text="Global" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White" FontSize="Title"/>
                     <StackLayout HorizontalOptions="Center" Orientation="Vertical" VerticalOptions="Center">
@@ -56,6 +111,8 @@
             </yummy:PancakeView>
         </StackLayout>
     </ScrollView>
+
+    -->
 
 
 </ContentPage>
