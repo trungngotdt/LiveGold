@@ -21,22 +21,26 @@
             </StackLayout.Triggers>
             <StackLayout>
 
-                <Entry Text="Ho Chi Minh City" IsReadOnly="True"/>
+                <Entry Text="Thành Phố Ho Chi Minh" IsReadOnly="True"/>
                 <ScrollView >
-                    <ListView ItemsSource="{Binding GoldSJCs}">
+                    <ListView ItemsSource="{Binding GoldSJCs}"
+                              HasUnevenRows="True">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <ViewCell>
-                                    <ViewCell.View>
+                                    <StackLayout Orientation="Vertical">
+                                        <Label Text="{Binding Type}" VerticalOptions="Center" FontSize="Large" FontAttributes="Bold"/>
                                         <StackLayout Orientation="Horizontal">
-                                            <Label Text="Buy:" VerticalOptions="Center"/>
-                                            <Label Text="{Binding Buy}" VerticalOptions="Center"/>
-                                            <Label Text="Sell:" VerticalOptions="Center"/>
-                                            <Label Text="{Binding Sell}" VerticalOptions="Center"/>
-                                            <Label Text="{Binding Type}" VerticalOptions="Center"/>
+                                            <Label Text="Mua:" VerticalOptions="Center" FontSize="Large" />
+                                            <Label Text="{Binding Buy}" VerticalOptions="Center" FontSize="Large"/>
+                                        </StackLayout>
+                                        <StackLayout>
+                                            <Label Text="Bán:" VerticalOptions="Center" FontSize="Large"/>
+                                            <Label Text="{Binding Sell}" VerticalOptions="Center" FontSize="Large"/>
 
                                         </StackLayout>
-                                    </ViewCell.View>
+
+                                    </StackLayout>
                                 </ViewCell>
 
                             </DataTemplate>
@@ -45,7 +49,7 @@
 
                 </ScrollView>
                 <TableView>
-                    <TableSection Title="Global">
+                    <TableSection Title="Thế giới">
                         <ViewCell>
                             <ViewCell.View>
                                 <StackLayout>
