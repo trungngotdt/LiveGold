@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Prism.Services;
 using LiveGold.Models;
+using HtmlAgilityPack;
 
 namespace LiveGold.ViewModels
 {
@@ -24,7 +25,7 @@ namespace LiveGold.ViewModels
         const string downColor = "Red";
         
         public string ColorBuyGlobal { get; set; }
-        
+        public string ColorSellGlobal { get; set; }
         public string BuyGlobal { get; set; }
         public string SellGlobal { get; set; }
        
@@ -109,8 +110,10 @@ namespace LiveGold.ViewModels
                 httpRequestMessage.Dispose();
             }
         }
+
         async Task GetGlobalPrice()
         {
+            
             using (var client = new HttpClient(new HttpClientHandler()
             {
                 AutomaticDecompression = DecompressionMethods.GZip,
@@ -129,7 +132,7 @@ namespace LiveGold.ViewModels
                 httpRequestMessage.Headers.TryAddWithoutValidation("accept-language", "en-US,en;q=0.9");
                 httpRequestMessage.Headers.TryAddWithoutValidation("dnt", "1");
                 var result = await client.SendAsync(httpRequestMessage);
-
+                
                 var json = await result.Content.ReadAsStringAsync();
                 var data = (JObject)JsonConvert.DeserializeObject(json);
 
@@ -140,6 +143,38 @@ namespace LiveGold.ViewModels
                 RaisePropertyChanged("BuyGlobal");
                 RaisePropertyChanged("ColorBuyGlobal");
                 httpRequestMessage.Dispose();
+            }
+        }
+
+        public async Task GetBidAndAskGold()
+        {
+            var handler = new HttpClientHandler()
+            {
+                AllowAutoRedirect = false
+            };
+            using (var client = new HttpClient(handler))
+            {
+                HttpResponseMessage response = await client.GetAsync("https://www.kitco.com/charts/livegold.html");
+                var html = await response.Content.ReadAsStringAsync();
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(html);
+                var bid = htmlDoc.DocumentNode.Descendants("span").FirstOrDefault(node => node.GetAttributeValue("id", "").Equals("sp-bid"));
+                var ask = htmlDoc.DocumentNode.Descendants("span").FirstOrDefault(node => node.GetAttributeValue("id", "").Equals("sp-ask"));
+                var bidValue = bid == null ? String.Empty : bid.FirstChild.InnerText;
+                var askValue = ask == null ? String.Empty : ask.FirstChild.InnerText;
+                ColorBuyGlobal = float.Parse(bidValue) >= float.Parse(BuyGlobal) ? upColor : downColor;
+                BuyGlobal = bidValue;
+
+                ColorSellGlobal = float.Parse(askValue) >= float.Parse(BuyGlobal) ? upColor : downColor;
+                SellGlobal = askValue;
+                
+                RaisePropertyChanged("BuyGlobal");
+                RaisePropertyChanged("ColorBuyGlobal");
+                RaisePropertyChanged("SellGlobal");
+                RaisePropertyChanged("ColorSellGlobal");
+                handler.Dispose();
+                client.Dispose();
+
             }
         }
         public override void Initialize(INavigationParameters parameters)

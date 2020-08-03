@@ -34,7 +34,7 @@
                                             <Label Text="Mua:" VerticalOptions="Center" FontSize="Large" />
                                             <Label Text="{Binding Buy}" VerticalOptions="Center" FontSize="Large"/>
                                         </StackLayout>
-                                        <StackLayout>
+                                        <StackLayout Orientation="Horizontal">
                                             <Label Text="Bán:" VerticalOptions="Center" FontSize="Large"/>
                                             <Label Text="{Binding Sell}" VerticalOptions="Center" FontSize="Large"/>
 
